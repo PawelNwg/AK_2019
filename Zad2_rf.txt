@@ -1,0 +1,85 @@
+#include  <msp430x14x.h>
+#define BT1 P4IN&BIT4
+#define BT2 P4IN&BIT5  // ustawienie przyciskow
+#define BT3 P4IN&BIT6
+#define BT4 P4IN&BIT7
+
+enum DIODA_ {DIODE1, DIODE2, DIODE3, DIODE4, DIODE5};
+typedef enum DIODE_ DIODE;
+
+void SwitchOFF(DIODE d)
+{
+    switch(d)
+    {
+        case(DIODE1):
+            P2OUT |= BIT1;
+            break;
+        case(DIODE2):
+            P1OUT &= ~BIT5;
+            break;
+        case(DIODE3):
+            P1OUT &= ~BIT6;
+            break;
+    }
+}
+
+void SetPorts()
+{
+    P2DIR |= BIT1;
+    P1DIR |= BIT5;
+    P1DIR |= BIT6;
+    SwitchOFF(DIODE1);
+    SwitchOFF(DIODE2);
+    SwitchOFF(DIODE3);
+}
+
+void SwitchON(DIODE d){
+    switch(d){
+        case(DIODE1):
+            P2OUT &= ~BIT1;
+            break;
+        case(DIODE2):
+            P1OUT |= BIT5;
+            break;
+        case(DIODE3):
+            P1OUT |= BIT6;
+            break;
+    }
+}
+
+void SetButtons()
+{
+        P4DIR &= ~BIT4;
+        P4DIR &= ~BIT5;
+        P4DIR &= ~BIT6;
+        P4DIR &= ~BIT7;
+}
+
+
+void main(void)
+{
+  WDTCTL = WDTPW + WDTHOLD;             // zatrzymanie watchdog timera
+  SetPorts();
+  SetButtons();
+
+  while(1){
+
+    
+    if(!(BT1))
+        SwitchON(DIODE1);
+    else
+        SwitchOFf(DIODE1);
+
+    if(!(BT2))
+        SwitchON(DIODE2);
+    else
+        SwitchOFf(DIODE2);
+
+    if(!(BT3))
+        SwitchON(DIODE3);
+    else
+        SwitchOFf(DIODE3);
+
+
+  }
+}

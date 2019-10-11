@@ -1,0 +1,66 @@
+#include  <msp430x14x.h>
+
+enum DIODE_ {DIODE1, DIODE2, DIODE3, DIODE4, DIODE5};
+
+typedef enum DIODE_ DIODE;
+
+void SwitchON(DIODE d){
+    switch(d){
+        case(DIODE1):
+            P2OUT &= ~BIT1;
+            break;
+        case(DIODE2):
+            P1OUT |= BIT5;
+            break;
+        case(DIODE3):
+            P1OUT |= BIT6;
+            break;
+    }
+}
+
+void SwitchOFF(DIODE d){
+    switch(d)
+    {
+        case(DIODE1):
+            P2OUT |= BIT1;
+            break;
+        case(DIODE2):
+            P1OUT &= ~BIT5;
+            break;
+        case(DIODE3):
+            P1OUT &= ~BIT6;
+            break;
+    }
+}
+
+void SetPorts()
+{
+    P2DIR |= BIT1;
+    P1DIR |= BIT5;
+    P1DIR |= BIT6;
+    SwitchOFF(DIODE1);
+    SwitchOFF(DIODE2);
+    SwitchOFF(DIODE3);
+}
+
+
+void Blink(unsigned long int time,DIODE d)
+{
+    volatile unsigned int i; //Zmienna ulotna, volatile oznacza, że zmienna lub obiekt mogą zostać zmienione "z zewnątrz"
+
+    for(i=0;i<time;i++)
+        SwitchON(d);
+    for(i=0;i<time;i++)
+        SwitchOFF(d);
+}
+
+void main(void)
+{
+  WDTCTL = WDTPW + WDTHOLD;     // zatrzymanie watchdog timera
+  SetPorts();                  // ustwienie portów dla diod
+
+  while(1)
+  {
+    Blink(20000,DIODE1);
+  }
+}

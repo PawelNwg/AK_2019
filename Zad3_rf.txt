@@ -1,0 +1,97 @@
+#include  <msp430x14x.h>
+#define BT1 P4IN&BIT4
+#define BT2 P4IN&BIT5  // ustawienie przyciskow
+#define BT3 P4IN&BIT6
+#define BT4 P4IN&BIT7
+
+enum DIODE_ {DIODE1, DIODE2, DIODE3, DIODE4, DIODE5};
+typedef enum DIODE_ DIODE;
+
+void SwitchOFF(DIODE d)
+{
+    switch(d)
+    {
+        case(DIODE1):
+            P2OUT |= BIT1;
+            break;
+        case(DIODE2):
+            P1OUT &= ~BIT5;
+            break;
+        case(DIODE3):
+            P1OUT &= ~BIT6;
+            break;
+    }
+}
+
+void SetPorts()
+{
+    P2DIR |= BIT1;
+    P1DIR |= BIT5;
+    P1DIR |= BIT6;
+    SwitchOFF(DIODE1);
+    SwitchOFF(DIODE2);
+    SwitchOFF(DIODE3);
+}
+
+void SwitchON(DIODE d)
+{
+    switch(d){
+        case(DIODE1):
+            P2OUT &= ~BIT1;
+            break;
+        case(DIODE2):
+            P1OUT |= BIT5;
+            break;
+        case(DIODE3):
+            P1OUT |= BIT6;
+            break;
+    }
+}
+
+
+void Blink(unsigned long int time,DIODE d)
+{
+    volatile unsigned int i; //Zmienna ulotna, volatile oznacza, że zmienna lub obiekt mogą zostać zmienione "z zewnątrz"
+
+    for(i=0;i<time;i++)
+        SwitchON(d);
+    for(i=0;i<time;i++)
+        SwitchOFF(d);
+}
+
+
+void SetButtons()
+{
+        P4DIR &= ~BIT4;
+        P4DIR &= ~BIT5;
+        P4DIR &= ~BIT6;
+        P4DIR &= ~BIT7;
+}
+
+
+
+void main(void)
+{
+  WDTCTL = WDTPW + WDTHOLD;             // zatrzymanie watchdog'a
+  SetPorts();
+  SetButtons();
+  int freq = 3000;
+
+  while(1)
+  {
+     Blink(freq,LED2);
+
+   if(!(BT2))
+     freq = freq + 300;
+
+   if(!(BT3))
+     freq = freq - 300;
+
+   if(!(BT4))
+     SwitchOFF(DIODE2);
+
+  }
+
+
+
+}
