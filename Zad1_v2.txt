@@ -1,0 +1,71 @@
+#include  <msp430x14x.h>
+
+// Zdefiniowanie typu wyliczeniowego dla możliwych diod
+enum DIODE_ {DIODE1, DIODE2, DIODE3, DIODE4, DIODE5};
+typedef enum DIODE_ DIODE;
+
+
+// Funkcja zaświecająca wybraną diodę
+void SwitchON(DIODE d){
+    switch(d){
+        case(DIODE1):
+            P2OUT &= ~BIT1;
+            break;
+        case(DIODE2):
+            P1OUT |= BIT5;
+            break;
+        case(DIODE3):
+            P1OUT |= BIT6;
+            break;
+    }
+}
+
+// Funkcja gasząca wybraną diodę
+void SwitchOFF(DIODE d){
+    switch(d)
+    {
+        case(DIODE1):
+            P2OUT |= BIT1;
+            break;
+        case(DIODE2):
+            P1OUT &= ~BIT5;
+            break;
+        case(DIODE3):
+            P1OUT &= ~BIT6;
+            break;
+    }
+}
+
+
+// Funkcja wprowadząjąca diodę wstan migotania
+void Blink(unsigned long int time,DIODE d)
+{
+
+//Zmienna ulotna, volatile oznacza, że zmienna lub obiekt mogą zostać zmienione "z zewnątrz"
+    volatile unsigned int i; 
+
+    for(i=0;i<time;i++)
+        SwitchON(d);
+    for(i=0;i<time;i++)
+        SwitchOFF(d);
+}
+
+void main(void)
+{
+
+// Zatrzymanie watchdog timera
+  WDTCTL = WDTPW + WDTHOLD;     
+ 
+// Ustawienie portów dla diod 
+P2DIR |= BIT1;  
+P1DIR |= BIT5;
+P1DIR |= BIT6;
+SwitchOFF(DIODE1);
+SwitchOFF(DIODE2);
+SwitchOFF(DIODE3);                
+
+  while(1)
+  {
+    Blink(20000,DIODE1);
+  }
+}
