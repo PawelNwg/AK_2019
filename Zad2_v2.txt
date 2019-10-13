@@ -1,0 +1,93 @@
+#include  <msp430x14x.h>
+
+// Ustawienie przyciskow
+#define BT1 P4IN&BIT4
+#define BT2 P4IN&BIT5  
+#define BT3 P4IN&BIT6
+#define BT4 P4IN&BIT7
+
+
+// Zdefiniowanie typu wyliczeniowego dla możliwych diod
+enum DIODA_ {DIODE1, DIODE2, DIODE3, DIODE4, DIODE5}; 
+typedef enum DIODE_ DIODE;
+
+
+// Funkcja gasząca wybraną diodę
+void SwitchOFF(DIODE d) 
+{
+    switch(d)
+    {
+        case(DIODE1):
+            P2OUT |= BIT1;
+            break;
+        case(DIODE2):
+            P1OUT &= ~BIT5;
+            break;
+        case(DIODE3):
+            P1OUT &= ~BIT6;
+            break;
+    }
+}
+
+
+// Funkcja zaświecająca wybraną diodę
+void SwitchON(DIODE d){ 
+    switch(d){
+        case(DIODE1):
+            P2OUT &= ~BIT1;
+            break;
+        case(DIODE2):
+            P1OUT |= BIT5;
+            break;
+        case(DIODE3):
+            P1OUT |= BIT6;
+            break;
+    }
+}
+
+
+
+void main(void)
+{
+
+// Zatrzymanie watchdog timera
+  WDTCTL = WDTPW + WDTHOLD;  
+
+// Ustawienie portów dla diod
+P2DIR |= BIT1; 
+P1DIR |= BIT5;
+P1DIR |= BIT6;
+SwitchOFF(DIODE1);
+SwitchOFF(DIODE2);
+SwitchOFF(DIODE3);
+
+// Ustawienie przycisków
+P4DIR &= ~BIT4; 
+P4DIR &= ~BIT5;
+P4DIR &= ~BIT6;
+P4DIR &= ~BIT7;
+
+
+  while(1){
+
+// Jeżeli przycisk BT1 zostanie wciśnięty to dioda się zaświeca
+    if(!(BT1)) 
+        SwitchON(DIODE1);
+    else
+        SwitchOFf(DIODE1);
+
+// Jeżeli przycisk BT2 zostanie wciśnięty to dioda się zaświeca
+    if(!(BT2)) 
+        SwitchON(DIODE2);
+    else
+        SwitchOFf(DIODE2);
+
+// Jeżeli przycisk BT3 zostanie wciśnięty to dioda się zaświeca
+    if(!(BT3)) 
+        SwitchON(DIODE3); 
+    else
+        SwitchOFf(DIODE3);
+
+
+  }
+}
