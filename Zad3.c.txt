@@ -1,0 +1,40 @@
+﻿#include  <msp430x14x.h>
+#define B1 P4IN&BIT4
+#define B2 P4IN&BIT5
+#define B3 P4IN&BIT6
+#define B4 P4IN&BIT7
+
+
+void delay (unsigned int n)
+ {
+  unsigned int i;
+  for(i=0;i<n;i++);
+ }
+
+void main(void)
+{ 
+  unsigned int i;
+  WDTCTL = WDTPW + WDTHOLD;             // zatrzymanie watchdog'a
+  P2DIR |= 0x02;                        // ustawienie P2.1 jako wyjście
+  P4DIR |= 0x0C;                        // P4.2 i P4.3 wyjścia
+  
+  P4OUT&=~0x04;
+  P4OUT&=~0x08;
+  
+  while(1){                
+  
+    if(!(B1 || B2 || B3))
+    for (i=0;i<6700;i++)              //uruchomienie brzęczyka
+    {
+      P4OUT&=~0x04;
+      P4OUT|=0x08;
+      delay(13);
+      P4OUT|=0x04;
+      P4OUT|=0x08;
+      delay(13);
+     }
+    P4OUT&=~0x04;
+  }
+ } 
+ 
+
